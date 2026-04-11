@@ -1,5 +1,6 @@
 package by.nurbolat.cloud_file_storage.exception.global;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

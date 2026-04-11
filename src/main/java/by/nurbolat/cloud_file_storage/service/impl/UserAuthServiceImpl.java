@@ -3,6 +3,7 @@ package by.nurbolat.cloud_file_storage.service.impl;
 import by.nurbolat.cloud_file_storage.dto.UserCreateDto;
 import by.nurbolat.cloud_file_storage.dto.UserLoginDto;
 import by.nurbolat.cloud_file_storage.dto.UserReadDto;
+import by.nurbolat.cloud_file_storage.entity.Roles;
 import by.nurbolat.cloud_file_storage.entity.User;
 import by.nurbolat.cloud_file_storage.exception.custom.EmailOrPasswordIncorrect;
 import by.nurbolat.cloud_file_storage.exception.custom.UserAlreadyExistsException;
@@ -43,6 +44,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         User user = userMapper.toEntity(userCreateDto);
 
         user.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
+        user.setRole(Roles.USER);
 
         User savedUser = userRepository.save(user);
 
