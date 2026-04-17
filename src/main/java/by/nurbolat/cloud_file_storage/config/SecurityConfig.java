@@ -26,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    CustomAuthenticationEntryPoint authEntryPoint,
-                                                   CustomAccessDeniedHandler accessDeniedHandler){
+                                                   CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(ex-> ex

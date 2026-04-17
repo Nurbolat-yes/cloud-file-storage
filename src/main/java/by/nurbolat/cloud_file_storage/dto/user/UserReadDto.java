@@ -1,4 +1,4 @@
-package by.nurbolat.cloud_file_storage.dto;
+package by.nurbolat.cloud_file_storage.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

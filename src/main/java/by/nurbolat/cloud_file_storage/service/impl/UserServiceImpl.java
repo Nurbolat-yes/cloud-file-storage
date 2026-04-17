@@ -1,6 +1,6 @@
 package by.nurbolat.cloud_file_storage.service.impl;
 
-import by.nurbolat.cloud_file_storage.dto.UserReadDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
 import by.nurbolat.cloud_file_storage.entity.User;
 import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.repository.UserRepository;
@@ -62,5 +62,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .email(user.get().getEmail())
                 .build();
     }
+
+    @Override
+    public Long getCurrentUserId() throws UserNotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null){
+            throw new UserNotFoundException("User not found");
+        }
+
+        var user = userRepository.findUserByEmail(authentication.getName());
+
+        if (user.isEmpty()){
+            throw new UsernameNotFoundException("User by username not found!");
+        }
+
+
+        return user.get().getId();
+    }
+
 
 }

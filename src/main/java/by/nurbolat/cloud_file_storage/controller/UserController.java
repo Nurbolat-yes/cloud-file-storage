@@ -1,6 +1,6 @@
 package by.nurbolat.cloud_file_storage.controller;
 
-import by.nurbolat.cloud_file_storage.dto.UserReadDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
 import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

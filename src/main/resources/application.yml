@@ -16,6 +16,11 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
+  minio:
+    url: ${MINIO_URL}
+    user: ${MINIO_USER}
+    password: ${MINIO_PASSWORD}
+    bucket: ${MINIO_BUCKET}
 
 server:
   servlet:

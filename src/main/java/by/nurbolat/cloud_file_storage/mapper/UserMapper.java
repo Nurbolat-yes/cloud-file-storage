@@ -1,8 +1,8 @@
 package by.nurbolat.cloud_file_storage.mapper;
 
-import by.nurbolat.cloud_file_storage.dto.UserCreateDto;
-import by.nurbolat.cloud_file_storage.dto.UserLoginDto;
-import by.nurbolat.cloud_file_storage.dto.UserReadDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserCreateDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserLoginDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
 import by.nurbolat.cloud_file_storage.entity.User;
 import org.mapstruct.Mapper;
 

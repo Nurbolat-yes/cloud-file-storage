@@ -1,14 +1,12 @@
 package by.nurbolat.cloud_file_storage.controller;
 
-import by.nurbolat.cloud_file_storage.dto.UserCreateDto;
-import by.nurbolat.cloud_file_storage.dto.UserLoginDto;
-import by.nurbolat.cloud_file_storage.dto.UserReadDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserCreateDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserLoginDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
 import by.nurbolat.cloud_file_storage.exception.custom.EmailOrPasswordIncorrect;
 import by.nurbolat.cloud_file_storage.exception.custom.UserAlreadyExistsException;
 import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
-import by.nurbolat.cloud_file_storage.exception.global.ExceptionResponse;
 import by.nurbolat.cloud_file_storage.service.UserAuthService;
-import io.swagger.v3.oas.annotations.OpenAPI31;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -22,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,9 +42,8 @@ public class UserAuthController {
                     @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, examples = {
                             @ExampleObject(value = """
                                     {
-                                        "status": 400,
-                                        "message": "too short password",
-                                        "timestamp": "2026-04-11T06:53:26.987Z"
+                                      "password": "Password must contain more 3 character",
+                                      "email": "Incorrect pattern of email"
                                     }
                                     """)
                     })
@@ -74,7 +73,8 @@ public class UserAuthController {
     })
     public ResponseEntity<?> createNewUser(@RequestBody @Validated UserCreateDto userCreateDto, HttpServletRequest request) throws UserAlreadyExistsException {
 
-        UserReadDto userReadDto = userAuthService.register(userCreateDto,request);
+        UserReadDto userReadDto = userAuthService.register(userCreateDto);
+        openSession(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userReadDto);
     }
@@ -89,14 +89,13 @@ public class UserAuthController {
                     @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, examples = {
                             @ExampleObject(value = """
                                     {
-                                        "status": 400,
-                                        "message": "too short email",
-                                        "timestamp": "2026-04-11T06:53:26.987Z"
+                                      "password": "Password must contain more 3 character",
+                                      "email": "Incorrect pattern of email"
                                     }
                                     """)
                     })
             }),
-            @ApiResponse(responseCode = "401", description = "Email already exist or password incorrect", content = {
+            @ApiResponse(responseCode = "401", description = "Email or password incorrect", content = {
                     @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE, examples = {
                             @ExampleObject(value = """
                                     {
@@ -121,7 +120,8 @@ public class UserAuthController {
     })
     public ResponseEntity<?> loginUser(@RequestBody @Validated UserLoginDto userLoginDto,HttpServletRequest request) throws EmailOrPasswordIncorrect, UserNotFoundException {
 
-        UserReadDto userReadDto = userAuthService.login(userLoginDto,request);
+        UserReadDto userReadDto = userAuthService.login(userLoginDto);
+        openSession(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(userReadDto);
     }
@@ -157,9 +157,23 @@ public class UserAuthController {
     })
     public ResponseEntity<?> logout(HttpServletRequest request) {
 
-        userAuthService.logout(request);
+        userAuthService.logout();
+        closeSession(request);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private void openSession(HttpServletRequest request){
+        request.getSession().setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
+    }
+
+    private void closeSession(HttpServletRequest request){
+        request.getSession(false).invalidate();
+
+
     }
 
 }

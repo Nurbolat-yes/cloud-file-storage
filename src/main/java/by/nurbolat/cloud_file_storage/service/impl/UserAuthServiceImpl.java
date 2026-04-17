@@ -1,8 +1,8 @@
 package by.nurbolat.cloud_file_storage.service.impl;
 
-import by.nurbolat.cloud_file_storage.dto.UserCreateDto;
-import by.nurbolat.cloud_file_storage.dto.UserLoginDto;
-import by.nurbolat.cloud_file_storage.dto.UserReadDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserCreateDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserLoginDto;
+import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
 import by.nurbolat.cloud_file_storage.entity.Roles;
 import by.nurbolat.cloud_file_storage.entity.User;
 import by.nurbolat.cloud_file_storage.exception.custom.EmailOrPasswordIncorrect;
@@ -11,7 +11,6 @@ import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.mapper.UserMapper;
 import by.nurbolat.cloud_file_storage.repository.UserRepository;
 import by.nurbolat.cloud_file_storage.service.UserAuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,7 +31,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public UserReadDto register(UserCreateDto userCreateDto, HttpServletRequest request) throws UserAlreadyExistsException {
+    public UserReadDto register(UserCreateDto userCreateDto) throws UserAlreadyExistsException {
 
         var maybeExistingUser = userRepository.findUserByEmail(userCreateDto.getEmail());
 
@@ -57,16 +55,11 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        request.getSession().setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext()
-        );
-
         return userMapper.toReadDto(savedUser);
     }
 
     @Override
-    public UserReadDto login(UserLoginDto userLoginDto, HttpServletRequest request) throws UsernameNotFoundException, EmailOrPasswordIncorrect, UserNotFoundException {
+    public UserReadDto login(UserLoginDto userLoginDto) throws EmailOrPasswordIncorrect, UserNotFoundException {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -77,11 +70,6 @@ public class UserAuthServiceImpl implements UserAuthService {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            request.getSession().setAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext()
-            );
 
             var user = userRepository.findUserByEmail(authentication.getName());
 
@@ -100,11 +88,8 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public void logout(HttpServletRequest request)  {
-
+    public void logout()  {
         SecurityContextHolder.clearContext();
-        request.getSession(false).invalidate();
-
     }
 
 }
