@@ -41,8 +41,7 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
     void createNewUser() throws Exception{
         UserCreateDto createDto = UserCreateDto
                 .builder()
-                .name("Nurbolat")
-                .email("nur@32")
+                .username("nur@32")
                 .password("secret")
                 .build();
 
@@ -54,23 +53,21 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.email").value("nur@32"))
                 .andExpect(authenticated());
 
-        var maybeUser = userRepository.findUserByEmail("nur@32");
+        var maybeUser = userRepository.findUserByUsername("nur@32");
 
         assertTrue(maybeUser.isPresent());
-        assertEquals(maybeUser.get().getName(),createDto.getName());
+        assertEquals(maybeUser.get().getUsername(),createDto.getUsername());
     }
 
     @Test
     void createUserWithExistingEmail() throws Exception {
         UserCreateDto original = UserCreateDto.builder()
-                .name("example")
-                .email("example@gmail")
+                .username("example@gmail")
                 .password("123")
                 .build();
 
         UserCreateDto duplicate = UserCreateDto.builder()
-                .name("example1")
-                .email("example@gmail")
+                .username("example@gmail")
                 .password("12345")
                 .build();
 
@@ -81,7 +78,7 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(duplicate)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("User with email: "+duplicate.getEmail()+" already exists!"))
+                .andExpect(jsonPath("$.message").value("User with email: "+duplicate.getUsername()+" already exists!"))
                 .andExpect(jsonPath("$.status").value("409"))
                 .andExpect(unauthenticated());
 
@@ -93,8 +90,7 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
     @Test
     void createUserWithIncorrectFields() throws Exception {
         UserCreateDto createDto = UserCreateDto.builder()
-                .name("someName")
-                .email("incorrectEmail")
+                .username("incorrectEmail")
                 .password("1")
                 .build();
 
@@ -106,7 +102,7 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.email").value("Incorrect pattern of email"))
                 .andExpect(unauthenticated());
 
-        var maybeUser = userRepository.findUserByEmail(createDto.getEmail());
+        var maybeUser = userRepository.findUserByUsername(createDto.getUsername());
 
         assertThat(maybeUser).isEmpty();
     }
@@ -115,13 +111,12 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
     void successUserLogin() throws Exception {
 
         userAuthService.register(new UserCreateDto(
-                "test",
                 "test@gmail.com",
                 "verySecret"
         ));
 
         UserLoginDto loginDto = UserLoginDto.builder()
-                .email("test@gmail.com")
+                .username("test@gmail.com")
                 .password("verySecret")
                 .build();
 
@@ -139,7 +134,6 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
     @Test
     void loginWithIncorrectCredentials() throws Exception{
         userAuthService.register(new UserCreateDto(
-                "test",
                 "test@gmail.com",
                 "verySecret"
         ));
@@ -147,7 +141,7 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
         SecurityContextHolder.clearContext();
 
         UserLoginDto loginDto = UserLoginDto.builder()
-                .email("test1@gmail.com")
+                .username("test1@gmail.com")
                 .password("verySecret1")
                 .build();
 
@@ -164,7 +158,7 @@ public class UserAuthControllerIT extends BaseIntegrationTest {
 
     @Test
     void successLogout() throws Exception {
-        userAuthService.register(new UserCreateDto("somename","example@1","secret"));
+        userAuthService.register(new UserCreateDto("example@1","secret"));
 
         assertNotNull(SecurityContextHolder.getContext().getAuthentication());
 
