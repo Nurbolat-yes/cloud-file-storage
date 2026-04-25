@@ -11,8 +11,6 @@ import lombok.Setter;
 @Schema(name = "UserReadDtoSchema")
 public class UserReadDto {
 
-    @Schema(example = "username", description = "Username")
-    private String name;
     @Schema(example = "example@mail.com", description = "user email")
-    private String email;
+    private String username;
 }

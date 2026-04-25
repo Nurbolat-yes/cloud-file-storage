@@ -25,6 +25,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(
+        origins = "http://localhost",
+        allowCredentials = "true"
+)
 @RestController
 @Tag(name = "Authentication",description = "API for authentication, registration and logout")
 @RequiredArgsConstructor

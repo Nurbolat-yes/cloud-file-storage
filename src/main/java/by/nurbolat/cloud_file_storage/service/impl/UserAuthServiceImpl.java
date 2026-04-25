@@ -33,10 +33,10 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UserReadDto register(UserCreateDto userCreateDto) throws UserAlreadyExistsException {
 
-        var maybeExistingUser = userRepository.findUserByEmail(userCreateDto.getEmail());
+        var maybeExistingUser = userRepository.findUserByUsername(userCreateDto.getUsername());
 
         if (maybeExistingUser.isPresent()){
-            throw new UserAlreadyExistsException("User with email: "+userCreateDto.getEmail()+" already exists!");
+            throw new UserAlreadyExistsException("User with email: "+userCreateDto.getUsername()+" already exists!");
         }
 
         User user = userMapper.toEntity(userCreateDto);
@@ -48,7 +48,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        userCreateDto.getEmail(),
+                        userCreateDto.getUsername(),
                         userCreateDto.getPassword()
                 )
         );
@@ -64,22 +64,21 @@ public class UserAuthServiceImpl implements UserAuthService {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            userLoginDto.getEmail(),
+                            userLoginDto.getUsername(),
                             userLoginDto.getPassword()
                     )
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            var user = userRepository.findUserByEmail(authentication.getName());
+            var user = userRepository.findUserByUsername(authentication.getName());
 
             if (user.isEmpty()){
                 throw new UserNotFoundException("User not found");
             }
 
             return UserReadDto.builder()
-                    .email(user.get().getEmail())
-                    .name(user.get().getName())
+                    .username(user.get().getUsername())
                     .build();
         }catch (BadCredentialsException | UsernameNotFoundException e){
             throw new EmailOrPasswordIncorrect();

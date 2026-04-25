@@ -13,10 +13,6 @@ public interface UserMapper {
 
     User toEntity(UserCreateDto userCreateDto);
 
-    User toEntity(UserReadDto userReadDto);
-
-    User toEntity(UserLoginDto userLoginDto);
-
     UserCreateDto toCreateDto(User user);
 
     UserReadDto toReadDto(User user);
@@ -24,9 +20,5 @@ public interface UserMapper {
     UserLoginDto toLoginDto(User user);
 
     List<UserCreateDto> toCreateDtoList(List<User> users);
-
-    List<UserReadDto> toReadDtoList(List<User> users);
-
-    List<UserLoginDto> toLoginDtoList(List<User> users);
 
 }

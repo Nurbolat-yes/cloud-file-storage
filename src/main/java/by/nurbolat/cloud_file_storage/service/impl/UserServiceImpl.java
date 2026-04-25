@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        var maybeUser = userRepository.findUserByEmail(username);
+        var maybeUser = userRepository.findUserByUsername(username);
 
         if (maybeUser.isEmpty())
             throw new UsernameNotFoundException("User with email: "+username+" not found!");
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         );
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                user.getUsername(),
                 user.getPassword(),
                 roles
         );
@@ -51,15 +51,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UserNotFoundException("User not found");
         }
 
-        var user = userRepository.findUserByEmail(authentication.getName());
+        var user = userRepository.findUserByUsername(authentication.getName());
 
         if (user.isEmpty()){
             throw new UsernameNotFoundException("User by username not found!");
         }
 
         return UserReadDto.builder()
-                .name(user.get().getName())
-                .email(user.get().getEmail())
+                .username(user.get().getUsername())
                 .build();
     }
 
@@ -71,7 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UserNotFoundException("User not found");
         }
 
-        var user = userRepository.findUserByEmail(authentication.getName());
+        var user = userRepository.findUserByUsername(authentication.getName());
 
         if (user.isEmpty()){
             throw new UsernameNotFoundException("User by username not found!");

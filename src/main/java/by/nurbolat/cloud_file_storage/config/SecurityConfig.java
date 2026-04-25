@@ -28,12 +28,14 @@ public class SecurityConfig {
                                                    CustomAuthenticationEntryPoint authEntryPoint,
                                                    CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(ex-> ex
                         .authenticationEntryPoint(authEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index.html", "/assets/**","/config.js","/favicon.ico").permitAll()
                         .requestMatchers("/swagger-ui/index.html","/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/sign-in","/api/auth/sign-up").permitAll()
                         .anyRequest().authenticated()

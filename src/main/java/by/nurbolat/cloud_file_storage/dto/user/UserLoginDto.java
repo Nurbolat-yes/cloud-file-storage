@@ -13,11 +13,11 @@ import lombok.*;
 @Builder
 @Schema(name = "UserLoginDto")
 public class UserLoginDto {
-    @Email(message = "Incorrect pattern of email")
-    @NotBlank(message = "Email must not be empty or null")
-    @Size(min = 3,max = 40,message = "Email must be between 3 and 40 character")
-    @Schema(example = "example@gmail.com", description = "example of correct email")
-    private String email;
+    @Email(message = "Incorrect pattern of username")
+    @NotBlank(message = "Username must not be empty or null")
+    @Size(min = 3,max = 40,message = "Username must be between 3 and 40 character")
+    @Schema(example = "example@gmail.com", description = "example of correct username")
+    private String username;
 
     @NotBlank(message = "Password can not be empty")
     @Schema(example = "secret", description = "example of user password")

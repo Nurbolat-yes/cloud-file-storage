@@ -11,6 +11,7 @@ import io.minio.errors.MinioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +63,35 @@ public class MinioServiceImpl implements MiniService {
         return minioRepository.getResource(fullPath);
     }
 
+    @Override
+    public void deleteResource(String path) throws UserNotFoundException, MinioException {
+        minioRepository.removeResource(path);
+    }
+
+    @Override
+    public StreamingResponseBody downloadResource(String path) throws UserNotFoundException {
+        return minioRepository.download(path);
+    }
+
+    @Override
+    public Optional<Resource> moveResource(String from, String to) throws UserNotFoundException, MinioException {
+
+        if (!to.startsWith("user-" + userService.getCurrentUserId() + "-files/")){
+            to = getFullPath(to);
+        }
+
+        return minioRepository.moveResource(from,to);
+    }
+
+    @Override
+    public List<Resource> serchByQuery(String query) throws UserNotFoundException, MinioException {
+        return minioRepository.search(getFullPath("/"),query);
+    }
+
     private String getFullPath(String path) throws UserNotFoundException {
+        if (path.equals("/")){
+            return "user-" + userService.getCurrentUserId() + "-files/";
+        }
         return "user-" + userService.getCurrentUserId() + "-files/" +path;
     }
 }
