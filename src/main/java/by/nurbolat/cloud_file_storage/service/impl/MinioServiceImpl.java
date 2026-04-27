@@ -3,7 +3,7 @@ package by.nurbolat.cloud_file_storage.service.impl;
 import by.nurbolat.cloud_file_storage.dto.minio.File;
 import by.nurbolat.cloud_file_storage.dto.minio.Folder;
 import by.nurbolat.cloud_file_storage.dto.minio.Resource;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.repository.MinioRepository;
 import by.nurbolat.cloud_file_storage.service.MiniService;
 import by.nurbolat.cloud_file_storage.service.UserService;
@@ -25,7 +25,7 @@ public class MinioServiceImpl implements MiniService {
     private final MinioRepository minioRepository;
 
     @Override
-    public Folder uploadFolder(String path) throws MinioException, IOException, UserNotFoundException {
+    public Folder uploadFolder(String path) throws MinioException, UserNotFoundException {
 
         String fullPath = getFullPath(path);
 
@@ -36,6 +36,7 @@ public class MinioServiceImpl implements MiniService {
     @Override
     public List<File> uploadFile(String path, List<MultipartFile> multipartFiles) throws UserNotFoundException, MinioException, IOException {
         List<File> results = new ArrayList<>();
+
         String fullPath = getFullPath(path);
 
         for (MultipartFile multipartFile:multipartFiles){
@@ -56,25 +57,31 @@ public class MinioServiceImpl implements MiniService {
     }
 
     @Override
-    public Optional<Resource> getResourceInformation(String path) throws UserNotFoundException, MinioException {
+    public Resource getResourceInformation(String path) throws UserNotFoundException {
 
         String fullPath = getFullPath(path);
 
-        return minioRepository.getResource(fullPath);
+        var maybeResource = minioRepository.getResource(fullPath);
+
+        return maybeResource.get();
     }
 
     @Override
-    public void deleteResource(String path) throws UserNotFoundException, MinioException {
+    public void deleteResource(String path) throws MinioException, UserNotFoundException {
+
         minioRepository.removeResource(path);
     }
 
     @Override
-    public StreamingResponseBody downloadResource(String path) throws UserNotFoundException {
+    public StreamingResponseBody downloadResource(String path) throws  UserNotFoundException {
         return minioRepository.download(path);
     }
 
     @Override
-    public Optional<Resource> moveResource(String from, String to) throws UserNotFoundException, MinioException {
+    public Optional<Resource> moveResource(String from, String to) throws UserNotFoundException,  MinioException {
+
+        System.out.println("PATH FROM : "+from);
+        System.out.println("PATH TO : "+ to);
 
         if (!to.startsWith("user-" + userService.getCurrentUserId() + "-files/")){
             to = getFullPath(to);
@@ -84,7 +91,8 @@ public class MinioServiceImpl implements MiniService {
     }
 
     @Override
-    public List<Resource> serchByQuery(String query) throws UserNotFoundException, MinioException {
+    public List<Resource> searchByQuery(String query) throws UserNotFoundException, MinioException {
+
         return minioRepository.search(getFullPath("/"),query);
     }
 

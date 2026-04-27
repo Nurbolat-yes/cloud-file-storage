@@ -17,10 +17,8 @@ export const throwSpecifyException = (status, detail) => {
             throw new ConflictException(detail.message);
         case 403:
             throw new ForbiddenException(detail.message);
-
         case 404:
             throw new NotFoundException(detail.message);
-
         case 413:
             throw new StorageExceedException(detail.message);
         default:

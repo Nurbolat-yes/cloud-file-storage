@@ -2,7 +2,7 @@ package by.nurbolat.cloud_file_storage.service.impl;
 
 import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
 import by.nurbolat.cloud_file_storage.entity.User;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.repository.UserRepository;
 import by.nurbolat.cloud_file_storage.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserReadDto getCurrentUser() throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null){
+        if (authentication == null || !authentication.isAuthenticated()){
             throw new UserNotFoundException("User not found");
         }
 

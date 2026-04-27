@@ -8,7 +8,7 @@ import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.asn1.x509.IetfAttrSyntax;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -25,8 +25,8 @@ import java.util.zip.ZipOutputStream;
 @Repository
 @RequiredArgsConstructor
 public class MinioRepository {
-
-    private static final String BUCKETNAME = "user-files";
+    @Value("${spring.minio.bucket}")
+    private String bucketName;
     private final MinioClient minioClient;
 
     public List<Resource> getResources(String fullPath) throws MinioException {
@@ -34,7 +34,7 @@ public class MinioRepository {
 
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs.builder()
-                        .bucket(BUCKETNAME)
+                        .bucket(bucketName)
                         .prefix(fullPath)
                         .recursive(false)
                         .build()
@@ -42,6 +42,10 @@ public class MinioRepository {
 
         for (Result<Item> result : results){
             Item item = result.get();
+
+            if (item.objectName().endsWith(".keep")){
+                continue;
+            }
 
             if (!item.isDir()) {
                 resultFiles.add(File.builder()
@@ -65,11 +69,11 @@ public class MinioRepository {
     }
 
 
-    public Folder createFolder(String fullPath) throws MinioException, IOException {
+    public Folder createFolder(String fullPath) throws MinioException {
         Folder folder = new Folder();
 
         minioClient.putObject(PutObjectArgs.builder()
-                        .bucket(BUCKETNAME)
+                        .bucket(bucketName)
                         .object(fullPath+".keep")
                         .stream(new ByteArrayInputStream(new byte[]{}),0L,-1L)
                         .build());
@@ -83,7 +87,7 @@ public class MinioRepository {
 
     public File createFile(String fullPath,MultipartFile multipartFile) throws MinioException, IOException {
         minioClient.putObject(PutObjectArgs.builder()
-                        .bucket(BUCKETNAME)
+                        .bucket(bucketName)
                         .object(fullPath+multipartFile.getOriginalFilename())
                         .stream(multipartFile.getInputStream(),multipartFile.getSize(),-1L)
                         .contentType(multipartFile.getContentType())
@@ -97,8 +101,7 @@ public class MinioRepository {
                 .build();
     }
 
-    public Optional<Resource> getResource(String fullPath) throws MinioException {
-        System.out.println("Get PATH = [" + fullPath + "]");
+    public Optional<Resource> getResource(String fullPath){
 
         boolean isDir = fullPath.endsWith("/");
 
@@ -106,7 +109,7 @@ public class MinioRepository {
 
             Iterable<Result<Item>> items = minioClient.listObjects(
                     ListObjectsArgs.builder()
-                            .bucket(BUCKETNAME)
+                            .bucket(bucketName)
                             .prefix(fullPath)
                             .recursive(false)
                             .build()
@@ -135,7 +138,7 @@ public class MinioRepository {
             try {
                 StatObjectResponse result = minioClient.statObject(
                         StatObjectArgs.builder()
-                                .bucket(BUCKETNAME)
+                                .bucket(bucketName)
                                 .object(fullPath)
                                 .build()
                 );
@@ -157,12 +160,11 @@ public class MinioRepository {
     }
 
     public void removeResource(String fullPath) throws MinioException {
-        System.out.println("DELETE PATH = [" + fullPath + "]");
 
         if (!fullPath.endsWith("/")){
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .bucket(BUCKETNAME)
+                            .bucket(bucketName)
                             .object(fullPath)
                             .build()
             );
@@ -170,7 +172,7 @@ public class MinioRepository {
         else {
              Iterable<Result<Item>> objects = minioClient.listObjects(
                      ListObjectsArgs.builder()
-                             .bucket(BUCKETNAME)
+                             .bucket(bucketName)
                              .prefix(fullPath)
                              .recursive(true)
                              .build()
@@ -181,7 +183,7 @@ public class MinioRepository {
 
                  minioClient.removeObject(
                          RemoveObjectArgs.builder()
-                                 .bucket(BUCKETNAME)
+                                 .bucket(bucketName)
                                  .object(item.objectName())
                                  .build()
                  );
@@ -190,7 +192,6 @@ public class MinioRepository {
     }
 
     public StreamingResponseBody download(String fullPath) {
-        System.out.println("DOWNLOAD PATH = [" + fullPath + "]");
 
         StreamingResponseBody stream = outputStream -> {
             try {
@@ -199,7 +200,7 @@ public class MinioRepository {
 
                     try (InputStream is = minioClient.getObject(
                             GetObjectArgs.builder()
-                                    .bucket(BUCKETNAME)
+                                    .bucket(bucketName)
                                     .object(fullPath)
                                     .build())) {
 
@@ -220,7 +221,7 @@ public class MinioRepository {
 
                     Iterable<Result<Item>> results = minioClient.listObjects(
                             ListObjectsArgs.builder()
-                                    .bucket(BUCKETNAME)
+                                    .bucket(bucketName)
                                     .prefix(fullPath)
                                     .recursive(true)
                                     .build()
@@ -233,7 +234,7 @@ public class MinioRepository {
 
                         try (InputStream is = minioClient.getObject(
                                 GetObjectArgs.builder()
-                                        .bucket(BUCKETNAME)
+                                        .bucket(bucketName)
                                         .object(item.objectName())
                                         .build())) {
 
@@ -266,8 +267,6 @@ public class MinioRepository {
     }
 
     public Optional<Resource> moveResource(String fromFullPath, String toFullPath) throws MinioException {
-        System.out.println("FROM PATH = [" + fromFullPath + "]");
-        System.out.println("TO PATH = [" + toFullPath + "]");
 
         if (getResource(toFullPath).isPresent()) {
             throw new IllegalArgumentException(
@@ -275,80 +274,74 @@ public class MinioRepository {
             );
         }
 
-        try {
-            if (fromFullPath.endsWith("/")) {
+        if (fromFullPath.endsWith("/")) {
 
-                Iterable<Result<Item>> objectsFromOldFolder = minioClient.listObjects(
-                        ListObjectsArgs.builder()
-                                .bucket(BUCKETNAME)
-                                .prefix(fromFullPath)
-                                .recursive(true)
-                                .build()
-                );
+            Iterable<Result<Item>> objectsFromOldFolder = minioClient.listObjects(
+                    ListObjectsArgs.builder()
+                            .bucket(bucketName)
+                            .prefix(fromFullPath)
+                            .recursive(true)
+                            .build()
+            );
 
-                for (Result<Item> result : objectsFromOldFolder) {
-                    Item item = result.get();
+            for (Result<Item> result : objectsFromOldFolder) {
+                Item item = result.get();
 
-                    if (item.isDir()) continue;
+                if (item.isDir()) continue;
 
-                    String oldObject = item.objectName();
+                String oldObject = item.objectName();
 
-                    String newObject =
-                            toFullPath + oldObject.substring(fromFullPath.length());
+                String newObject =
+                        toFullPath + oldObject.substring(fromFullPath.length());
 
-                    System.out.println("COPY: " + oldObject + " -> " + newObject);
-
-                    minioClient.copyObject(
-                            CopyObjectArgs.builder()
-                                    .bucket(BUCKETNAME)
-                                    .object(newObject)
-                                    .source(
-                                            SourceObject.builder()
-                                                    .bucket(BUCKETNAME)
-                                                    .object(oldObject)
-                                                    .build()
-                                    )
-                                    .build()
-                    );
-
-                    minioClient.removeObject(
-                            RemoveObjectArgs.builder()
-                                    .bucket(BUCKETNAME)
-                                    .object(oldObject)
-                                    .build()
-                    );
-                }
-            }
-            else {
+                System.out.println("COPY: " + oldObject + " -> " + newObject);
 
                 minioClient.copyObject(
                         CopyObjectArgs.builder()
-                                .bucket(BUCKETNAME)
-                                .object(toFullPath)
+                                .bucket(bucketName)
+                                .object(newObject)
                                 .source(
                                         SourceObject.builder()
-                                                .bucket(BUCKETNAME)
-                                                .object(fromFullPath)
+                                                .bucket(bucketName)
+                                                .object(oldObject)
                                                 .build()
                                 )
                                 .build()
                 );
-                System.out.println("COPIED OK");
 
                 minioClient.removeObject(
                         RemoveObjectArgs.builder()
-                                .bucket(BUCKETNAME)
-                                .object(fromFullPath)
+                                .bucket(bucketName)
+                                .object(oldObject)
                                 .build()
                 );
-                System.out.println("DELETED OK");
             }
-
-            return getResource(toFullPath);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        else {
+
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(toFullPath)
+                            .source(
+                                    SourceObject.builder()
+                                            .bucket(bucketName)
+                                            .object(fromFullPath)
+                                            .build()
+                            )
+                            .build()
+            );
+
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(fromFullPath)
+                            .build()
+            );
+        }
+
+        return getResource(toFullPath);
+
     }
 
     public List<Resource> search(String fullPath,String query) throws MinioException {
@@ -356,7 +349,7 @@ public class MinioRepository {
 
         Iterable<Result<Item>> results = minioClient.listObjects(
                 ListObjectsArgs.builder()
-                        .bucket(BUCKETNAME)
+                        .bucket(bucketName)
                         .prefix(fullPath)
                         .recursive(true)
                         .build()

@@ -3,9 +3,9 @@ package by.nurbolat.cloud_file_storage.service;
 import by.nurbolat.cloud_file_storage.dto.user.UserCreateDto;
 import by.nurbolat.cloud_file_storage.dto.user.UserLoginDto;
 import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
-import by.nurbolat.cloud_file_storage.exception.custom.EmailOrPasswordIncorrect;
-import by.nurbolat.cloud_file_storage.exception.custom.UserAlreadyExistsException;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.EmailOrPasswordIncorrect;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserAlreadyExistsException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 
 
 public interface UserAuthService {

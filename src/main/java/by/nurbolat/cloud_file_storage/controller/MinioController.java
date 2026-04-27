@@ -3,11 +3,11 @@ package by.nurbolat.cloud_file_storage.controller;
 import by.nurbolat.cloud_file_storage.dto.minio.File;
 import by.nurbolat.cloud_file_storage.dto.minio.Folder;
 import by.nurbolat.cloud_file_storage.dto.minio.Resource;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.service.MiniService;
 import io.minio.errors.MinioException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.codec.ResourceEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +23,7 @@ import java.util.Optional;
         origins = "http://localhost",
         allowCredentials = "true"
 )
+@Tag(name="Minio Service", description = "Minio endpoints for managing resources")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -43,13 +44,10 @@ public class MinioController {
 
     @GetMapping(value = "/resource")
     public ResponseEntity<Resource> getResource(@RequestParam("path") String path) throws UserNotFoundException, MinioException {
-        Optional<Resource> resource = miniService.getResourceInformation(path);
 
-        if (resource.isPresent()){
-            return new ResponseEntity<>(resource.get(),HttpStatus.OK);
-        }
+        Resource resource = miniService.getResourceInformation(path);
+        return new ResponseEntity<>(resource,HttpStatus.OK);
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(value = "/resource/download")
@@ -75,9 +73,6 @@ public class MinioController {
     public ResponseEntity<Resource> moveResource(@RequestParam("from") String from,
                                              @RequestParam("to") String to) throws UserNotFoundException, MinioException {
 
-        System.out.println(from);
-        System.out.println(to);
-
         Optional<Resource> resource = miniService.moveResource(from,to);
 
         return new ResponseEntity<>(resource.get(),HttpStatus.OK);
@@ -86,7 +81,7 @@ public class MinioController {
     @GetMapping(value = "/resource/search")
     public ResponseEntity<List<Resource>> searchResource(@RequestParam("query") String query) throws UserNotFoundException, MinioException {
 
-        List<Resource> resources = miniService.serchByQuery(query);
+        List<Resource> resources = miniService.searchByQuery(query);
 
         return new ResponseEntity<>(resources,HttpStatus.OK);
     }

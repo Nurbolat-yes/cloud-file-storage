@@ -3,7 +3,7 @@ package by.nurbolat.cloud_file_storage.service;
 import by.nurbolat.cloud_file_storage.dto.minio.File;
 import by.nurbolat.cloud_file_storage.dto.minio.Folder;
 import by.nurbolat.cloud_file_storage.dto.minio.Resource;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 import io.minio.errors.MinioException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -20,7 +20,7 @@ public interface MiniService {
 
     List<Resource> getFolderResources(String path) throws UserNotFoundException, MinioException;
 
-    Optional<Resource> getResourceInformation(String path) throws UserNotFoundException, MinioException;
+    Resource getResourceInformation(String path) throws UserNotFoundException, MinioException;
 
     void deleteResource(String path) throws UserNotFoundException, MinioException;
 
@@ -28,5 +28,5 @@ public interface MiniService {
 
     Optional<Resource> moveResource(String fromPath,String toPath) throws UserNotFoundException, MinioException;
 
-    List<Resource> serchByQuery(String query) throws UserNotFoundException, MinioException;
+    List<Resource> searchByQuery(String query) throws UserNotFoundException, MinioException;
 }

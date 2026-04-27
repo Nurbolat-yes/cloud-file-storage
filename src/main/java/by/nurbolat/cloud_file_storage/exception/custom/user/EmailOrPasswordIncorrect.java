@@ -1,4 +1,4 @@
-package by.nurbolat.cloud_file_storage.exception.custom;
+package by.nurbolat.cloud_file_storage.exception.custom.user;
 
 public class EmailOrPasswordIncorrect extends Exception{
     @Override

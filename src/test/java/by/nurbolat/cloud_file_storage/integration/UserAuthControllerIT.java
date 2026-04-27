@@ -2,7 +2,7 @@ package by.nurbolat.cloud_file_storage.integration;
 
 import by.nurbolat.cloud_file_storage.dto.user.UserCreateDto;
 import by.nurbolat.cloud_file_storage.dto.user.UserLoginDto;
-import by.nurbolat.cloud_file_storage.exception.custom.UserAlreadyExistsException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserAlreadyExistsException;
 import by.nurbolat.cloud_file_storage.repository.UserRepository;
 import by.nurbolat.cloud_file_storage.service.UserAuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -3,9 +3,9 @@ package by.nurbolat.cloud_file_storage.controller;
 import by.nurbolat.cloud_file_storage.dto.user.UserCreateDto;
 import by.nurbolat.cloud_file_storage.dto.user.UserLoginDto;
 import by.nurbolat.cloud_file_storage.dto.user.UserReadDto;
-import by.nurbolat.cloud_file_storage.exception.custom.EmailOrPasswordIncorrect;
-import by.nurbolat.cloud_file_storage.exception.custom.UserAlreadyExistsException;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.EmailOrPasswordIncorrect;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserAlreadyExistsException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.service.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -75,7 +75,7 @@ public class UserAuthController {
                     })
             })
     })
-    public ResponseEntity<?> createNewUser(@RequestBody @Validated UserCreateDto userCreateDto, HttpServletRequest request) throws UserAlreadyExistsException {
+    public ResponseEntity<?> register(@RequestBody @Validated UserCreateDto userCreateDto, HttpServletRequest request) throws UserAlreadyExistsException {
 
         UserReadDto userReadDto = userAuthService.register(userCreateDto);
         openSession(request);
@@ -176,8 +176,6 @@ public class UserAuthController {
 
     private void closeSession(HttpServletRequest request){
         request.getSession(false).invalidate();
-
-
     }
 
 }

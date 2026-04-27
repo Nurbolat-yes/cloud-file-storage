@@ -1,9 +1,9 @@
 package by.nurbolat.cloud_file_storage.exception.auth;
 
-import by.nurbolat.cloud_file_storage.exception.custom.EmailOrPasswordIncorrect;
-import by.nurbolat.cloud_file_storage.exception.custom.UserNotFoundException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.EmailOrPasswordIncorrect;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserNotFoundException;
 import by.nurbolat.cloud_file_storage.exception.global.ExceptionResponse;
-import by.nurbolat.cloud_file_storage.exception.custom.UserAlreadyExistsException;
+import by.nurbolat.cloud_file_storage.exception.custom.user.UserAlreadyExistsException;
 import by.nurbolat.cloud_file_storage.exception.global.GlobalExceptionHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

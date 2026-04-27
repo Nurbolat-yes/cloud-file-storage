@@ -8,7 +8,7 @@ window.APP_CONFIG = {
 
     //адрес вашего бэка. если пустой - значит на одном url с таким же портом.
     //если запускаете бэк и фронт через докер compose - тут ставите имя бэка в докер сети
-    baseUrl: "",
+    baseUrl: "http://localhost:8080",
 
     //API префикс вашего бэка
     baseApi: "/api",
@@ -30,7 +30,7 @@ window.APP_CONFIG = {
     validUsername: {
         minLength: 5,
         maxLength: 20,
-        pattern: "^[a-zA-Z0-9]+[a-zA-Z_0-9]*[a-zA-Z0-9]+$",
+        pattern: "^[a-zA-Z0-9]+@[a-zA-Z_0-9]*[a-zA-Z0-9]+$",
     },
 
     //корректный пароль
@@ -89,7 +89,5 @@ window.APP_CONFIG = {
                 folder: obj.type === "DIRECTORY" // фронт использует простой boolean. Если папка имеет другое название - смените
             }
         },
-
     }
-
 };
