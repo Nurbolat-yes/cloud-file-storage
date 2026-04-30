@@ -2,7 +2,7 @@
 # ☁️ Cloud File Storage
 
 A full-stack personal cloud file storage application — similar to Google Drive — that allows users to upload, organize, search, move, rename, preview, and download files through a modern web interface.
-The frontend implemented by https://github.com/zhukovsd/cloud-storage-frontend/. I just get frontend from here. I focused on backend.
+The frontend implemented by https://github.com/zhukovsd/cloud-storage-frontend/. I used a ready-made frontend from here. I focus on the backend.
 
 **Live Demo:**
 - 🌐 Frontend: [http://13.60.208.77:80](http://13.60.208.77/)
