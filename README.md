@@ -41,7 +41,6 @@ The frontend implemented by https://github.com/zhukovsd/cloud-storage-frontend/.
 - **File Preview** — Preview media and documents directly in the browser
 - **Dark Mode** — Toggle between light and dark themes
 - **Per-User Isolation** — Each user's files are stored in a dedicated namespace (`user-{id}-files/`) in MinIO
-- **Role-Based Access** — Users have `USER` or `ADMIN` roles
 
 ---
 
@@ -62,19 +61,6 @@ The frontend implemented by https://github.com/zhukovsd/cloud-storage-frontend/.
 | Lombok | — | Boilerplate reduction |
 | SpringDoc OpenAPI (Swagger) | 2.8.8 | API documentation |
 | Gradle | 8.5 | Build tool |
-
-### Frontend
-| Technology | Version | Purpose |
-|---|---|---|
-| React | 19 | UI framework |
-| Vite | 6 | Build tool & dev server |
-| MUI (Material UI) | 6.4.5 | Component library |
-| React Router DOM | 7 | Client-side routing |
-| Axios | 1.7.9 | HTTP client |
-| Framer Motion | 12 | Animations |
-| React Player | 2.16 | Media file preview |
-| React Selecto | 1.26 | Multi-select via drag |
-| React Moveable | 0.56 | Drag interactions |
 
 ### Infrastructure
 | Service | Image | Purpose |
