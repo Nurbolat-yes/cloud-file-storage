@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(
-        origins = "http://13.60.208.77",
+        origins = "http://51.20.191.104",
         allowCredentials = "true"
 )
 @RestController

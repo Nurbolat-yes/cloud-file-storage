@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin(
-        origins = "http://13.60.208.77",
+        origins = "http://51.20.191.104",
         allowCredentials = "true"
 )
 @Tag(name="Minio Service", description = "Minio endpoints for managing resources")

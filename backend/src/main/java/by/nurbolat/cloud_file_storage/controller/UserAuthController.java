@@ -26,7 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(
-        origins = "http://13.60.208.77",
+        origins = "http://51.20.191.104",
         allowCredentials = "true"
 )
 @RestController
